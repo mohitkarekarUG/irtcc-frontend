@@ -1,0 +1,22 @@
+[
+    {
+        "name": "Rohan",
+        "memberId": 123,
+        "control": false
+    },
+    {
+        "name": "Mohit",
+        "memberId": 124,
+        "control": false
+    },
+    {
+        "name": "Jasmin",
+        "memberId": 125,
+        "control": true
+    },
+    {
+        "name": "Sourav",
+        "memberId": 126,
+        "control": false
+    }
+]
