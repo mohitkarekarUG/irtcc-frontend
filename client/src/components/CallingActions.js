@@ -9,44 +9,48 @@ class CallingActions extends Component {
         onMicBtnClick: PropTypes.func,
         onCallEndClick: PropTypes.func,
         onVideoBtnClick: PropTypes.func,
-        onAddInteractionBtnClick: PropTypes.func
-    };
-
-    onMicBtnClick = () => {
-        this.props.onMicBtnClick();
-    };
-    onCallEndClick = () => {
-        this.props.onCallEndClick();
-    };
-    onVideoBtnClick = () => {
-        this.props.onVideoBtnClick();
+        onAddInteractionBtnClick: PropTypes.func,
+        onShowParticipantsBtnClick: PropTypes.func
     };
 
     render() {
         return (
             <div className={styles.footerBar}>
                 <div className={styles.addInteractionBtn}>
-                    <Button type="dashed" block onClick={this.props.onAddInteractionBtnClick}>
+                    <Button
+                        type="dashed"
+                        block
+                        onClick={this.props.onAddInteractionBtnClick}
+                    >
                         + Add Interactions
                     </Button>
                 </div>
                 <div className={styles.coreActions}>
-                    <div className={styles.callingBtn}>
+                    <div
+                        className={styles.callingBtn}
+                        onClick={this.props.onMicBtnClick}
+                    >
                         <MdMicOff />
                     </div>
                     <div
-                        className={
-                            styles.callingBtn + " " + styles.callEndBtn
-                        }
+                        className={styles.callingBtn + " " + styles.callEndBtn}
+                        onClick={this.props.onCallEndClick}
                     >
                         <MdCallEnd />
                     </div>
-                    <div className={styles.callingBtn}>
+                    <div
+                        className={styles.callingBtn}
+                        onClick={this.props.onVideoBtnClick}
+                    >
                         <MdVideocamOff />
                     </div>
                 </div>
                 <div className={styles.showParticipantsBtn}>
-                    <Button type="dashed" block>
+                    <Button
+                        type="dashed"
+                        block
+                        onClick={this.props.onShowParticipantsBtnClick}
+                    >
                         Show Participants
                     </Button>
                 </div>
