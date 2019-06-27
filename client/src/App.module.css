@@ -17,36 +17,24 @@
     transition: opacity 250ms cubic-bezier(0.4, 0, 1, 1),
         transform 250ms cubic-bezier(0.4, 0, 1, 1);
 }
-.sidebar.active {
+.sidebarActive {
     transform: translate(0);
 }
-
-.sidebarHeader {
-    height: 60px;
-    padding: 0 24px;
-    font-size: 13px;
-    line-height: 60px;
-    color: rgb(105, 116, 121);
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.mainContent {
+.content {
     width: 100%;
     height: 90vh;
     background-color: rgb(28, 32, 34);
     color: #fff;
 }
 
-#codeEditor {
+.codeEditor {
     width: 100% !important;
     height: 75vh !important;
     box-shadow: 0 0 16px 4px rgba(0, 0, 0, 0.06);
     border-radius: 4px;
 }
 
-.ant-spin-spinning {
+.spinner {
     position: absolute !important;
     left: 50%;
     top: 50%;

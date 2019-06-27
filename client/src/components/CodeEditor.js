@@ -7,6 +7,7 @@ import "brace/theme/monokai";
 
 class CodeEditor extends Component {
     static propTypes = {
+        className: PropTypes.string,
         value: PropTypes.string,
         readOnly: PropTypes.bool,
         onCodeChange: PropTypes.func.isRequired
@@ -17,11 +18,11 @@ class CodeEditor extends Component {
     };
 
     render() {
-        const { value } = this.props;
+        const { className, value } = this.props;
         return (
             <div style={{ height: "100%" }}>
-                <header className="sidebarHeader">Editor</header>
                 <AceEditor
+                    className={className}
                     mode="javascript"
                     theme="monokai"
                     onChange={this.onChange}
