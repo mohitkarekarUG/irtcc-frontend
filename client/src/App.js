@@ -8,9 +8,11 @@ import CallingActions from "./components/CallingActions.js";
 import { Spin } from "antd";
 import "antd/dist/antd.css";
 import styles from "./App.module.css";
+import StudentList from "./components/StudentList";
+import { List, Checkbox } from "antd";
 
-const serverEndpoint = "http://172.25.6.70:8080";
-const socketServerEndpoint = "http://172.25.6.70:8080";
+const serverEndpoint = "http://192.168.3.52:8080";
+const socketServerEndpoint = "http://192.168.3.52:8080";
 
 class App extends Component {
     static propTypes = {
@@ -27,7 +29,10 @@ class App extends Component {
             isEditorActive: false,
             isCreateInteractionModalActive: false,
             // Zoom Related states
-            meetingId: this.getUrlVars()['m']
+            meetingId: this.getUrlVars()["m"],
+            memberId: "123123141112",
+            userWithControl: null,
+            members: []
         };
 
         // Inits
@@ -72,7 +77,7 @@ class App extends Component {
             "addMember",
             {
                 meetingId: this.state.meetingId,
-                memberId: "12312314",
+                memberId: this.state.memberId,
                 isAdmin: true
             },
             function(response) {
@@ -86,8 +91,8 @@ class App extends Component {
             "createInteraction",
             {
                 meetingId: this.state.meetingId,
-                questionType: questionType,
-                initialData: data
+                type: questionType,
+                data: data
             },
             response => {
                 console.log(response);
@@ -100,8 +105,8 @@ class App extends Component {
             "updateData",
             {
                 meetingId: this.state.meetingId,
-                questionType: "coding",
-                initialData: `var a = 3;\nvar x = (100 + 50) * a;\ndocument.getElementById("demo").innerHTML = x;`
+                type: "coding",
+                data: this.state.jsExample1
             },
             response => {
                 console.log(response);
@@ -109,13 +114,13 @@ class App extends Component {
         );
     };
 
-    emitToggleControl = ({ questionType, data }) => {
+    emitToggleControl = () => {
         this.socket.emit(
             "toggleControl",
             {
                 meetingId: this.state.meetingId,
-                questionType: questionType,
-                initialData: data
+                memberId: this.state.memberId,
+                socketId: this.socket.id
             },
             response => {
                 console.log(response);
@@ -125,32 +130,38 @@ class App extends Component {
 
     listenToNewInteraction = () => {
         this.socket.on("newInteraction", data => {
-            console.log(data);
+            this.setState({ isEditorActive: true });
         });
     };
 
     listenToNewMemberAdded = () => {
         this.socket.on("newMemberAdded", data => {
-            console.log(data);
+            this.setState({ members: data.members });
+            console.log(data.members);
         });
     };
 
     listenToDataUpdated = () => {
-        this.socket.on("dataUpdated", data => {
+        this.socket.on("dataUpdated", ({ data }) => {
+            this.setState({ jsExample1: data });
             console.log(data);
         });
     };
 
     listenToToggleControl = () => {
-        this.socket.on("toggleControl", data => {
-            console.log(data);
+        this.socket.on("controlChanged", ({ memberId }) => {
+            this.setState({ userWithControl: memberId });
         });
     };
 
-    // Misc Functions
+    handleControlToggle = memberId => {
+        this.setState({ userWithControl: memberId }, this.emitToggleControl);
+    };
 
+    // Misc Functions
     handleCodeChange = ({ newValue }) => {
-        console.log("Code was changed", newValue);
+        this.setState({ jsExample1: newValue.newValue }, this.emitUpdateData);
+        // console.log("Code was changed", newValue.newValue);
     };
 
     handleAddInteractionBtnClick = () => {
@@ -177,12 +188,15 @@ class App extends Component {
         return (
             <div className={styles.root}>
                 <InteractionsCoding
+                    readOnly={
+                        this.state.memberId !== this.state.userWithControl
+                    }
                     className={styles.codeEditor}
                     value={this.state.jsExample1}
                     isEditorActive={isEditorActive}
                     onChange={this.handleCodeChange}
                 />
-                <div className={styles.content} id="init-zoom-here">
+                <div className={styles.content} id='init-zoom-here'>
                     <Spin className={styles.spinner} />
                 </div>
                 <CallingActions
@@ -200,6 +214,27 @@ class App extends Component {
                         visible={isCreateInteractionModalActive}
                         onClose={this.handleAddInteractionBtnClick}
                         onCreation={this.emitCreateInteraction}
+                    />
+                </div>
+                <div>
+                    <List
+                        dataSource={this.state.members}
+                        renderItem={member => (
+                            <List.Item key={member.memberId}>
+                                <Checkbox
+                                    checked={
+                                        member.memberId ===
+                                        this.state.userWithControl
+                                    }
+                                    onChange={e =>
+                                        this.handleControlToggle(
+                                            member.memberId
+                                        )
+                                    }
+                                />
+                                {" " + member.memberId}
+                            </List.Item>
+                        )}
                     />
                 </div>
             </div>

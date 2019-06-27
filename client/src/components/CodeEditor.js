@@ -32,6 +32,7 @@ class CodeEditor extends Component {
                     value={value}
                 />
             </div>
+            
         );
     }
 }
