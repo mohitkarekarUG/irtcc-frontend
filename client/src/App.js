@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import axios from "axios";
 import socketIOClient from "socket.io-client";
 import InteractionsCoding from "./components/interactions/Coding.js";
 import CreateInteractionModal from "./components/interactions/CreateInteractionModal.js";
@@ -8,6 +9,7 @@ import { Spin } from "antd";
 import "antd/dist/antd.css";
 import styles from "./App.module.css";
 
+const serverEndpoint = "http://172.25.6.70:8080";
 const socketServerEndpoint = "http://172.25.6.70:8080";
 
 class App extends Component {
@@ -25,12 +27,40 @@ class App extends Component {
             isEditorActive: false,
             isCreateInteractionModalActive: false,
             // Zoom Related states
-            meetingId: window.location.pathname.substr(1)
+            meetingId: this.getUrlVars()['m']
         };
 
         // Inits
         this.initSocketConnection(socketServerEndpoint);
+        this.listenToNewInteraction();
+        this.listenToNewMemberAdded();
+        this.listenToDataUpdated();
+        this.listenToToggleControl();
     }
+
+    componentDidMount() {
+        if (window.location.pathname.includes("/join-meeting/")) {
+            const { meetingId } = this.state;
+            axios
+                .get(serverEndpoint + `/meeting/${meetingId}`)
+                .then(meeting => {
+                    //need to be corrected to right values
+                    this.setState({ meetingId, joinUrl: meeting.join_url });
+                });
+            this.emitAddMember();
+        }
+    }
+
+    getUrlVars = () => {
+        const vars = {};
+        const parts = window.location.href.replace(
+            /[?&]+([^=&]+)=([^&]*)/gi,
+            function(m, key, value) {
+                vars[key] = value;
+            }
+        );
+        return vars;
+    };
 
     // Socket Functions
     initSocketConnection = endpoint => {
@@ -42,8 +72,8 @@ class App extends Component {
             "addMember",
             {
                 meetingId: this.state.meetingId,
-                memberId: "123123",
-                isAdmin: false
+                memberId: "12312314",
+                isAdmin: true
             },
             function(response) {
                 console.log(response);
@@ -113,12 +143,6 @@ class App extends Component {
 
     listenToToggleControl = () => {
         this.socket.on("toggleControl", data => {
-            console.log(data);
-        });
-    };
-
-    listenToToggleChanged = () => {
-        this.socket.on("toggleChanged", data => {
             console.log(data);
         });
     };
