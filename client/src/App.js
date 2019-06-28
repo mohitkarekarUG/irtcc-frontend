@@ -11,8 +11,8 @@ import styles from "./App.module.css";
 import StudentList from "./components/StudentList";
 import { List, Checkbox } from "antd";
 
-const serverEndpoint = "http://192.168.3.52:8080";
-const socketServerEndpoint = "http://192.168.3.52:8080";
+const serverEndpoint = "https://irtcc.herokuapp.com/";
+const socketServerEndpoint = "https://irtcc.herokuapp.com/";
 
 class App extends Component {
     static propTypes = {
@@ -30,7 +30,7 @@ class App extends Component {
             isCreateInteractionModalActive: false,
             // Zoom Related states
             meetingId: this.getUrlVars()["m"],
-            memberId: "123123141112",
+            memberId: "1231",
             userWithControl: null,
             members: []
         };
@@ -217,27 +217,29 @@ class App extends Component {
                         onCreation={this.emitCreateInteraction}
                     />
                 </div>
-                <div>
-                    <List
-                        dataSource={this.state.members}
-                        renderItem={member => (
-                            <List.Item key={member.memberId}>
-                                <Checkbox
-                                    checked={
-                                        member.memberId ===
-                                        this.state.userWithControl
-                                    }
-                                    onChange={e =>
-                                        this.handleControlToggle(
-                                            member.memberId
-                                        )
-                                    }
-                                />
-                                {" " + member.memberId}
-                            </List.Item>
-                        )}
-                    />
-                </div>
+                {this.state.admin ? (
+                    <div>
+                        <List
+                            dataSource={this.state.members}
+                            renderItem={member => (
+                                <List.Item key={member.memberId}>
+                                    <Checkbox
+                                        checked={
+                                            member.memberId ===
+                                            this.state.userWithControl
+                                        }
+                                        onChange={e =>
+                                            this.handleControlToggle(
+                                                member.memberId
+                                            )
+                                        }
+                                    />
+                                    {" " + member.memberId}
+                                </List.Item>
+                            )}
+                        />
+                    </div>
+                ) : null}
             </div>
         );
     }
