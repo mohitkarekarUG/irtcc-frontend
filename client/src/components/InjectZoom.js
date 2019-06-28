@@ -50,7 +50,7 @@ class InjectZoom extends Component {
             leaveUrl: "https://www.upgrad.com/",
             isSupportAV: true,
             success: function() {
-                let id = setInterval(() => ZoomMtg.join({
+                ZoomMtg.join({
                     meetingNumber: meetConfig.meetingNumber,
                     userName: meetConfig.userName,
                     signature: signature,
@@ -58,7 +58,6 @@ class InjectZoom extends Component {
                     userEmail: "email@gmail.com",
                     passWord: meetConfig.passWord,
                     success: function(res) {
-                        clearInterval(id)
                         console.log("zoom success msg", res);
                         ZoomMtg.showJoinAudioFunction({
                             show: false
@@ -71,7 +70,7 @@ class InjectZoom extends Component {
                     error: function(res) {
                         console.log(res);
                     }
-                }), 500)
+                })
             },
             error: function(res) {
                 console.log(res);
