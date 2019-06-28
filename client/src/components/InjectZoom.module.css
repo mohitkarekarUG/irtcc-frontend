@@ -1,0 +1,13 @@
+.codeEditor {
+    width: 100% !important;
+    height: 75vh !important;
+    box-shadow: 0 0 16px 4px rgba(0, 0, 0, 0.06);
+    border-radius: 4px;
+}
+
+.spinner {
+    position: absolute !important;
+    left: 50%;
+    top: 50%;
+    transform: translateX(-50%) translateY(-50%);
+}

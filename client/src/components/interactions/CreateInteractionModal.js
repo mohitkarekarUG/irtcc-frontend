@@ -1,10 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import CodeEditor from "../CodeEditor";
-import { Modal, Button } from "antd";
-import { Input } from "antd";
-
-const { TextArea } = Input;
+import { Modal } from "antd";
 
 class CreateInteractionModal extends Component {
     static propTypes = {
