@@ -30,7 +30,7 @@ class InjectZoom extends Component {
             meetingNumber: parseInt(this.props.zoomId), //HardCoded
             userName: "Rohan's Local", //HardCoded
             passWord: "",
-            leaveUrl: "https://zoom.us",
+            leaveUrl: "/",
             role: 0
         };
 
@@ -47,10 +47,10 @@ class InjectZoom extends Component {
         console.log("signature", signature);
 
         ZoomMtg.init({
-            leaveUrl: "http://www.zoom.us",
+            leaveUrl: "https://www.upgrad.com/",
             isSupportAV: true,
             success: function() {
-                ZoomMtg.join({
+                let id = setInterval(() => ZoomMtg.join({
                     meetingNumber: meetConfig.meetingNumber,
                     userName: meetConfig.userName,
                     signature: signature,
@@ -58,6 +58,7 @@ class InjectZoom extends Component {
                     userEmail: "email@gmail.com",
                     passWord: meetConfig.passWord,
                     success: function(res) {
+                        clearInterval(id)
                         console.log("zoom success msg", res);
                         ZoomMtg.showJoinAudioFunction({
                             show: false
@@ -70,7 +71,7 @@ class InjectZoom extends Component {
                     error: function(res) {
                         console.log(res);
                     }
-                });
+                }), 500)
             },
             error: function(res) {
                 console.log(res);
