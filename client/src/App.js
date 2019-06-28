@@ -160,7 +160,11 @@ class App extends Component {
 
     // Misc Functions
     handleCodeChange = ({ newValue }) => {
-        this.setState({ jsExample1: newValue.newValue }, this.emitUpdateData);
+        this.state.memberId === this.state.userWithControl &&
+            this.setState(
+                { jsExample1: newValue.newValue },
+                this.emitUpdateData
+            );
         // console.log("Code was changed", newValue.newValue);
     };
 
@@ -188,9 +192,6 @@ class App extends Component {
         return (
             <div className={styles.root}>
                 <InteractionsCoding
-                    readOnly={
-                        this.state.memberId !== this.state.userWithControl
-                    }
                     className={styles.codeEditor}
                     value={this.state.jsExample1}
                     isEditorActive={isEditorActive}

@@ -18,18 +18,14 @@ class Coding extends Component {
     };
 
     render() {
-        const { value, isEditorActive=false } = this.props;
+        const { value, isEditorActive = false } = this.props;
         return (
             <div
                 className={cx(styles.container, {
                     [styles.active]: isEditorActive
-                })}
-            >
+                })}>
                 <header className={styles.header}>Editor</header>
-                <CodeEditor
-                    value={value}
-                    onCodeChange={this.onChange}
-                />
+                <CodeEditor value={value} onCodeChange={this.onChange} />
             </div>
         );
     }
