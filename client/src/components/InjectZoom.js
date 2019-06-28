@@ -30,8 +30,8 @@ class InjectZoom extends Component {
         var meetConfig = {
             apiKey: API_KEY,
             apiSecret: API_SECRET,
-            meetingNumber: parseInt(952715299), //HardCoded
-            userName: "Rohan's Local", //HardCoded
+            meetingNumber: parseInt(283831279), //HardCoded
+            userName: "WebApp", //HardCoded
             passWord: "",
             leaveUrl: "https://zoom.us",
             role: 0

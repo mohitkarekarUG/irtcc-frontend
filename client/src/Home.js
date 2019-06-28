@@ -4,6 +4,11 @@ import { Layout, Button } from "antd";
 const { Header, Content, Footer } = Layout;
 
 class Home extends Component {
+    componentDidMount() {
+        document
+            .getElementsByTagName("body")[0]
+            .classList.add("deIndexZoom");
+    }
     handleOnCreateMeetingClick = () => {
 
     }

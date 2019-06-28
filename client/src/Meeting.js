@@ -34,8 +34,13 @@ class Meeting extends Component {
                 type: '',
                 value: ''
             },
+            selfUserId: '',
+            isSelfMute: false,
             // Zoom Related states
-            meetingId: this.getUrlVars()['m']
+            meetingId: this.getUrlVars()['m'],
+            allMembers: [],
+
+
         };
 
         // Inits
@@ -57,7 +62,20 @@ class Meeting extends Component {
             //     });
             this.emitAddMember();
         }
+        document
+            .getElementsByTagName("body")[0]
+            .classList.remove("deIndexZoom");
     }
+
+    fetchListOfAttendees = () => {
+        axios
+            .get(serverEndpoint + `/getMembers/`, { meetingId: this.state.meetingId})
+            .then(response => {
+                console.log("fetchListOfAttendees", response);
+
+                // this.setState({ meetingId, joinUrl: meeting.join_url });
+            });
+    };
 
     getUrlVars = () => {
         const vars = {};
@@ -148,6 +166,10 @@ class Meeting extends Component {
     listenToNewMemberAdded = () => {
         this.socket.on("newMemberAdded", data => {
             console.log(data);
+            const newMembers = this.allMembers.push(data.data);
+            this.setState({
+                allMembers: newMembers
+            });
         });
     };
 
@@ -174,11 +196,14 @@ class Meeting extends Component {
                 .isCreateInteractionModalActive
         });
     };
-    handleMicBtnClick = ({ newValue }) => {
-        console.log("Code was changed", newValue);
+    handleMicBtnClick = () => {
+        window.ZoomMtg.mute({
+            userId: this.state.selfUserId,
+            mute: this.state.isSelfMute
+        });
     };
-    handleCallEndClick = ({ newValue }) => {
-        console.log("Code was changed", newValue);
+    handleCallEndClick = () => {
+        window.ZoomMtg.leaveMeeting({});
     };
     handleVideoBtnClick = ({ newValue }) => {
         console.log("Code was changed", newValue);
