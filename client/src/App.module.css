@@ -41,3 +41,14 @@
     top: 50%;
     transform: translateX(-50%) translateY(-50%);
 }
+
+.iframe {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    height: 200px;
+    width: 500px;
+    border: none;
+    background: #fff;
+    border-radius: 5px
+}

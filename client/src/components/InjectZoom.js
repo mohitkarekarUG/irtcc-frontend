@@ -29,7 +29,7 @@ class InjectZoom extends Component {
             meetingNumber: parseInt(this.props.zoomId), //HardCoded
             userName: "Rohan's Local", //HardCoded
             passWord: "",
-            leaveUrl: "https://zoom.us",
+            leaveUrl: "https://www.upgrad.com",
             role: 0
         };
 

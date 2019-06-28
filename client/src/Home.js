@@ -13,7 +13,7 @@ class Home extends Component {
     }
     handleOnCreateMeetingClick = () => {
         axios.post('https://irtcc.herokuapp.com/meeting/create', { meetingTopic: this.state.meetingTopic }).then(({ data }) => {
-            this.props.history.push('/join-meeting', { meeting: data.data.meeting})
+            this.props.history.push('/join-meeting', { meeting: data.data.meeting })
         })
     }
     render() {

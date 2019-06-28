@@ -10,8 +10,8 @@ import { Spin, Radio } from "antd";
 import "antd/dist/antd.css";
 import styles from "./App.module.css";
 
-const serverEndpoint = "http://localhost:8080";
-const socketServerEndpoint = "http://localhost:8080";
+const serverEndpoint = "https://irtcc.herokuapp.com";
+const socketServerEndpoint = "https://irtcc.herokuapp.com";
 
 class Meeting extends Component {
     static propTypes = {
@@ -48,11 +48,13 @@ class Meeting extends Component {
             axios
                 .get(serverEndpoint + `/meeting/${meetingId}`)
                 .then(meeting => {
-                    this.setState({ zoomId: meeting.zoomId, joinUrl: meeting.zoomUrl });
+                    this.setState({ showIframe: true, iframeUrl: meeting.zoomUrl })
+                    this.setState({ zoomId: meeting.zoomId });
                 });
             this.emitAddMember();
         } else if(this.props.location.state) {
-            console.log(this.props.location.state.meeting.zoomId)
+            console.log(this.props.location.state.meeting)
+            this.setState({ showIframe: true, iframeUrl: this.props.location.state.meeting.zoomUrl.replace('/s/', '/wc/') + '/start' })
             this.setState({ zoomId: this.props.location.state.meeting.zoomId })
         }
     }
@@ -226,6 +228,10 @@ class Meeting extends Component {
                         })}
                     </Radio.Group>
                 </div>
+
+                {this.state.showIframe ? <div className={styles.iframe}>
+                    <iframe src={this.state.iframeUrl} title="zoom"></iframe>
+                </div> : null}
             </div>
         );
     }
