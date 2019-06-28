@@ -1,17 +1,30 @@
 import React, { Component } from "react";
-import { Layout, Button } from "antd";
+import { Layout, Button, Input } from "antd";
+import axios from 'axios'
 
 const { Header, Content, Footer } = Layout;
 
 class Home extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            meetingTopic: ""
+        };
+    }
     componentDidMount() {
-        document
-            .getElementsByTagName("body")[0]
-            .classList.add("deIndexZoom");
+        document.getElementsByTagName("body")[0].classList.add("deIndexZoom");
     }
     handleOnCreateMeetingClick = () => {
-
-    }
+        axios
+            .post("https://irtcc.herokuapp.com/meeting/create", {
+                meetingTopic: this.state.meetingTopic
+            })
+            .then(({ data }) => {
+                this.props.history.push("/join-meeting", {
+                    meeting: data.data.meeting
+                });
+            });
+    };
     render() {
         return (
             <Layout>
@@ -33,6 +46,10 @@ class Home extends Component {
                             minHeight: 640
                         }}
                     >
+                        <Input
+                            defaultValue="Important Meeting"
+                            onChange={v => this.setState({ meetingTopic: v })}
+                        />
                         <Button
                             type="primary"
                             icon="poweroff"

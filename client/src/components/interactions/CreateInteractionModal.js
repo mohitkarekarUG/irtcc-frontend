@@ -48,9 +48,9 @@ class CreateInteractionModal extends Component {
         const { inputValue } = this.state;
         return (
             <Modal
-                style={{ top: 20 }}
+                style={{ top: 0, left: 0, marginLeft: 0 }}
                 title="Coding"
-                width="660px"
+                width="520px"
                 visible={visible}
                 onOk={this.handleSubmitClick}
                 okText="Create Interaction"

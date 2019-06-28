@@ -7,11 +7,9 @@ let ZoomMtg = window.ZoomMtg;
 
 class InjectZoom extends Component {
     static propTypes = {
-        onMicBtnClick: PropTypes.func
+        onMicBtnClick: PropTypes.func,
+        zoomId: PropTypes.string.isRequired,
     };
-    constructor(props) {
-        super(props);
-    }
 
     componentDidMount() {
         this.initZoom();
@@ -26,12 +24,11 @@ class InjectZoom extends Component {
 
         var API_KEY = "BNXad-PpS1KgXfQ_2AoUWw";
         var API_SECRET = "BByoa44DHTtJreFXbmMXlo7IJcP2twKJq5an";
-
         var meetConfig = {
             apiKey: API_KEY,
             apiSecret: API_SECRET,
-            meetingNumber: parseInt(283831279), //HardCoded
-            userName: "WebApp", //HardCoded
+            meetingNumber: parseInt(this.props.zoomId), //HardCoded
+            userName: "Rohan's Local", //HardCoded
             passWord: "",
             leaveUrl: "https://zoom.us",
             role: 0

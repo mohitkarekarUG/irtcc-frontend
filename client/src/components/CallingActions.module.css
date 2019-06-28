@@ -4,6 +4,7 @@
     opacity: 1;
     height: 88px;
     position: fixed;
+    z-index: 100;
     text-align: center;
     align-items: center;
     justify-content: center;
