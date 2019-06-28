@@ -7,21 +7,16 @@ import CreateInteractionModal from "./components/interactions/CreateInteractionM
 import CallingActions from "./components/CallingActions.js";
 import InjectZoom from "./components/InjectZoom.js";
 import { Spin, Radio } from "antd";
-import "antd/dist/antd.css";
 import styles from "./App.module.css";
 
 const serverEndpoint = "https://irtcc.herokuapp.com";
 const socketServerEndpoint = "https://irtcc.herokuapp.com";
 
 class Meeting extends Component {
-    static propTypes = {
-        location: PropTypes.object
-    };
-
     constructor(props) {
         super(props);
         this.state = {
-            jsExample1: `var a = 3;\nvar x = (100 + 50) * a;\ndocument.getElementById("demo").innerHTML = x;`,
+            interActionValue: `var a = 3;\nvar x = (100 + 50) * a;\ndocument.getElementById("demo").innerHTML = x;`,
             socketServerEndpoint,
             // Layout/Feature States
             admin: true,
@@ -31,7 +26,8 @@ class Meeting extends Component {
             meetingId: this.getUrlVars()["m"],
             memberId: "123123141112",
             userWithControl: null,
-            members: []
+            members: [],
+            zoomId: "648551424"
         };
 
         // Inits
@@ -46,7 +42,7 @@ class Meeting extends Component {
         if (window.location.pathname.includes("/join-meeting/")) {
             const { meetingId } = this.state;
             axios
-                .get(serverEndpoint + `/meeting/${meetingId}`)
+                .get(serverEndpoint + `/meeting/${meetingId}/`)
                 .then(meeting => {
                     this.setState({ showIframe: true, iframeUrl: meeting.zoomUrl })
                     this.setState({ zoomId: meeting.zoomId });
@@ -57,7 +53,20 @@ class Meeting extends Component {
             this.setState({ showIframe: true, iframeUrl: this.props.location.state.meeting.zoomUrl.replace('/s/', '/wc/') + '/start' })
             this.setState({ zoomId: this.props.location.state.meeting.zoomId })
         }
+        document
+            .getElementsByTagName("body")[0]
+            .classList.remove("deIndexZoom");
     }
+
+    fetchListOfAttendees = () => {
+        axios
+            .get(serverEndpoint + `/getMembers/`, { meetingId: this.state.meetingId})
+            .then(response => {
+                console.log("fetchListOfAttendees", response);
+
+                // this.setState({ meetingId, joinUrl: meeting.join_url });
+            });
+    };
 
     getUrlVars = () => {
         const vars = {};
@@ -109,7 +118,7 @@ class Meeting extends Component {
             {
                 meetingId: this.state.meetingId,
                 type: "coding",
-                data: this.state.jsExample1
+                data: this.state.interActionValue
             },
             response => {
                 console.log(response);
@@ -133,6 +142,8 @@ class Meeting extends Component {
 
     listenToNewInteraction = () => {
         this.socket.on("newInteraction", data => {
+            console.log("newInteraction");
+
             this.setState({ isEditorActive: true });
         });
     };
@@ -146,7 +157,7 @@ class Meeting extends Component {
 
     listenToDataUpdated = () => {
         this.socket.on("dataUpdated", ({ data }) => {
-            this.setState({ jsExample1: data });
+            this.setState({ interActionValue: data });
             console.log(data);
         });
     };
@@ -166,7 +177,9 @@ class Meeting extends Component {
     handleCodeChange = ({ newValue }) => {
         this.state.memberId === this.state.userWithControl &&
             this.setState(
-                { jsExample1: newValue.newValue },
+                {
+                    interActionValue: newValue.newValue
+                },
                 this.emitUpdateData
             );
         // console.log("Code was changed", newValue.newValue);
@@ -178,11 +191,14 @@ class Meeting extends Component {
                 .isCreateInteractionModalActive
         });
     };
-    handleMicBtnClick = ({ newValue }) => {
-        console.log("Code was changed", newValue);
+    handleMicBtnClick = () => {
+        window.ZoomMtg.mute({
+            userId: this.state.selfUserId,
+            mute: this.state.isSelfMute
+        });
     };
-    handleCallEndClick = ({ newValue }) => {
-        console.log("Code was changed", newValue);
+    handleCallEndClick = () => {
+        window.ZoomMtg.leaveMeeting({});
     };
     handleVideoBtnClick = ({ newValue }) => {
         console.log("Code was changed", newValue);
@@ -192,7 +208,11 @@ class Meeting extends Component {
     };
 
     render() {
-        const { isEditorActive, isCreateInteractionModalActive } = this.state;
+        const {
+            isEditorActive,
+            isCreateInteractionModalActive,
+            zoomId,
+        } = this.state;
         return (
             <div className={styles.root}>
                 <InteractionsCoding
@@ -202,10 +222,14 @@ class Meeting extends Component {
                     onChange={this.handleCodeChange}
                 />
                 <div className={styles.content}>
-                    {this.state.zoomId ? <InjectZoom zoomId={this.state.zoomId}/> : null}
+                    {this.state.zoomId ? (
+                        <InjectZoom zoomId={this.state.zoomId} />
+                    ) : null}
                 </div>
                 <CallingActions
-                    onAddInteractionBtnClick={this.handleAddInteractionBtnClick}
+                    onAddInteractionBtnClick={
+                        this.handleAddInteractionBtnClick
+                    }
                     onMicBtnClick={this.handleMicBtnClick}
                     onCallEndClick={this.handleCallEndClick}
                     onVideoBtnClick={this.handleVideoBtnClick}
@@ -222,9 +246,19 @@ class Meeting extends Component {
                     />
                 </div>
                 <div className={styles.radioGroup}>
-                    <Radio.Group onChange={this.handleControlToggle} value={this.state.userWithControl}>
+                    <Radio.Group
+                        onChange={this.handleControlToggle}
+                        value={this.state.userWithControl}
+                    >
                         {this.state.members.map(m => {
-                            return <Radio className={styles.radio} value={m.memberId}>{m.memberId}</Radio>
+                            return (
+                                <Radio
+                                    className={styles.radio}
+                                    value={m.memberId}
+                                >
+                                    {m.memberId}
+                                </Radio>
+                            );
                         })}
                     </Radio.Group>
                 </div>

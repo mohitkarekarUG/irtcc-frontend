@@ -6,16 +6,26 @@ const { Header, Content, Footer } = Layout;
 
 class Home extends Component {
     constructor(props) {
-        super(props)
+        super(props);
         this.state = {
-            meetingTopic: ''
-        }
+            meetingTopic: ""
+        };
+    }
+
+    componentDidMount() {
+        document.getElementsByTagName("body")[0].classList.add("deIndexZoom");
     }
     handleOnCreateMeetingClick = () => {
-        axios.post('https://irtcc.herokuapp.com/meeting/create', { meetingTopic: this.state.meetingTopic }).then(({ data }) => {
-            this.props.history.push('/join-meeting', { meeting: data.data.meeting })
-        })
-    }
+        axios
+            .post("https://irtcc.herokuapp.com/meeting/create", {
+                meetingTopic: this.state.meetingTopic
+            })
+            .then(({ data }) => {
+                this.props.history.push("/join-meeting", {
+                    meeting: data.data.meeting
+                });
+            });
+    };
     render() {
         return (
             <Layout>
@@ -45,7 +55,7 @@ class Home extends Component {
                             type="primary"
                             icon="poweroff"
                             loading={false}
-                            onClick={this.handleOnCreateMeetingClick()}
+                            onClick={this.handleOnCreateMeetingClick}
                         >
                             Create new Meeting
                         </Button>

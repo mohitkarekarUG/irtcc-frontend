@@ -10,15 +10,20 @@ class CallingActions extends Component {
         onCallEndClick: PropTypes.func,
         onVideoBtnClick: PropTypes.func,
         onAddInteractionBtnClick: PropTypes.func,
-        onShowParticipantsBtnClick: PropTypes.func
+        onShowParticipantsBtnClick: PropTypes.func,
+        meetingId: PropTypes.string
     };
+
+    copyToClipboard = () => {
+
+    }
 
     render() {
         return (
             <div className={styles.footerBar}>
                 <div className={styles.addInteractionBtn}>
                     <Button
-                        type="dashed"
+                        type="primary"
                         block
                         onClick={this.props.onAddInteractionBtnClick}
                     >
@@ -33,25 +38,27 @@ class CallingActions extends Component {
                         <MdMicOff />
                     </div>
                     <div
-                        className={styles.callingBtn + " " + styles.callEndBtn}
+                        className={
+                            styles.callingBtn + " " + styles.callEndBtn
+                        }
                         onClick={this.props.onCallEndClick}
                     >
                         <MdCallEnd />
                     </div>
-                    <div
+                    {/* <div
                         className={styles.callingBtn}
                         onClick={this.props.onVideoBtnClick}
                     >
                         <MdVideocamOff />
-                    </div>
+                    </div> */}
                 </div>
                 <div className={styles.showParticipantsBtn}>
                     <Button
                         type="dashed"
                         block
-                        onClick={this.props.onShowParticipantsBtnClick}
+                        onClick={this.copyToClipboard}
                     >
-                        Show Participants
+                        {window.location.href}
                     </Button>
                 </div>
             </div>

@@ -20,7 +20,7 @@ class CodeEditor extends Component {
     render() {
         const { className, value } = this.props;
         return (
-            <div style={{ height: "100%" }}>
+            <div style={{ minHeight: "230px" }}>
                 <AceEditor
                     className={className}
                     mode="javascript"

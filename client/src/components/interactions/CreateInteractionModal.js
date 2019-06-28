@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import CodeEditor from "../CodeEditor";
 import { Modal } from "antd";
+import styles from "./CreateInteractionModal.module.css";
 
 class CreateInteractionModal extends Component {
     static propTypes = {
@@ -47,12 +48,11 @@ class CreateInteractionModal extends Component {
         const { inputValue } = this.state;
         return (
             <Modal
-                style={{ top: 20 }}
+                style={{ top: 0, left: 0, marginLeft: 0 }}
                 title="Coding"
-                width="660px"
+                width="520px"
                 visible={visible}
                 onOk={this.handleSubmitClick}
-                onCancel={this.hideModal}
                 okText="Create Interaction"
                 cancelText="cancel"
                 okButtonProps={{
@@ -60,6 +60,7 @@ class CreateInteractionModal extends Component {
                 }}
             >
                 <CodeEditor
+                    className={styles.editor}
                     value={inputValue}
                     onCodeChange={this.onChange}
                 />
