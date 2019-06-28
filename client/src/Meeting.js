@@ -4,17 +4,14 @@ import axios from "axios";
 import socketIOClient from "socket.io-client";
 import InteractionsCoding from "./components/interactions/Coding.js";
 import CreateInteractionModal from "./components/interactions/CreateInteractionModal.js";
-import InjectZoom from "./components/InjectZoom.js";
 import CallingActions from "./components/CallingActions.js";
+import InjectZoom from "./components/InjectZoom.js";
+import { Spin, Radio } from "antd";
 import "antd/dist/antd.css";
 import styles from "./App.module.css";
 
-// const serverEndpoint = "http://172.25.6.70:8080";
-// const serverEndpoint = "https://irtcc.herokuapp.com";
-const serverEndpoint = "http://192.168.43.250:8080";
-// const socketServerEndpoint = "http://172.25.6.70:8080";
-// const socketServerEndpoint = "https://irtcc.herokuapp.com";
-const socketServerEndpoint = "http://192.168.43.250:8080";
+const serverEndpoint = "http://localhost:8080";
+const socketServerEndpoint = "http://localhost:8080";
 
 class Meeting extends Component {
     static propTypes = {
@@ -24,18 +21,17 @@ class Meeting extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            // jsExample1: `var a = 3;\nvar x = (100 + 50) * a;\ndocument.getElementById("demo").innerHTML = x;`,
+            jsExample1: `var a = 3;\nvar x = (100 + 50) * a;\ndocument.getElementById("demo").innerHTML = x;`,
             socketServerEndpoint,
             // Layout/Feature States
             admin: true,
             isEditorActive: false,
             isCreateInteractionModalActive: false,
-            interaction: {
-                type: '',
-                value: ''
-            },
             // Zoom Related states
-            meetingId: this.getUrlVars()['m']
+            meetingId: this.getUrlVars()["m"],
+            memberId: "123123141112",
+            userWithControl: null,
+            members: []
         };
 
         // Inits
@@ -49,13 +45,15 @@ class Meeting extends Component {
     componentDidMount() {
         if (window.location.pathname.includes("/join-meeting/")) {
             const { meetingId } = this.state;
-            // axios
-            //     .get(serverEndpoint + `/meeting/${meetingId}`)
-            //     .then(meeting => {
-            //         //need to be corrected to right values
-            //         this.setState({ meetingId, joinUrl: meeting.join_url });
-            //     });
+            axios
+                .get(serverEndpoint + `/meeting/${meetingId}`)
+                .then(meeting => {
+                    this.setState({ zoomId: meeting.zoomId, joinUrl: meeting.zoomUrl });
+                });
             this.emitAddMember();
+        } else if(this.props.location.state) {
+            console.log(this.props.location.state.meeting.zoomId)
+            this.setState({ zoomId: this.props.location.state.meeting.zoomId })
         }
     }
 
@@ -80,7 +78,7 @@ class Meeting extends Component {
             "addMember",
             {
                 meetingId: this.state.meetingId,
-                memberId: "123121",
+                memberId: this.state.memberId,
                 isAdmin: true
             },
             function(response) {
@@ -109,7 +107,7 @@ class Meeting extends Component {
             {
                 meetingId: this.state.meetingId,
                 type: "coding",
-                data: `var a = 3;\nvar x = (100 + 50) * a;\ndocument.getElementById("demo").innerHTML = x;`
+                data: this.state.jsExample1
             },
             response => {
                 console.log(response);
@@ -117,13 +115,13 @@ class Meeting extends Component {
         );
     };
 
-    emitToggleControl = ({ questionType, data }) => {
+    emitToggleControl = () => {
         this.socket.emit(
             "toggleControl",
             {
                 meetingId: this.state.meetingId,
-                questionType: questionType,
-                initialData: data
+                memberId: this.state.memberId,
+                socketId: this.socket.id
             },
             response => {
                 console.log(response);
@@ -132,40 +130,44 @@ class Meeting extends Component {
     };
 
     listenToNewInteraction = () => {
-        this.socket.on("newInteraction", response => {
-            if (response.type) {
-                this.setState({
-                    isEditorActive: true,
-                    interaction: {
-                        type: response.type,
-                        value: response.data
-                    }
-                });
-            }
+        this.socket.on("newInteraction", data => {
+            this.setState({ isEditorActive: true });
         });
     };
 
     listenToNewMemberAdded = () => {
         this.socket.on("newMemberAdded", data => {
-            console.log(data);
+            this.setState({ members: data.members });
+            console.log(data.members);
         });
     };
 
     listenToDataUpdated = () => {
-        this.socket.on("dataUpdated", data => {
+        this.socket.on("dataUpdated", ({ data }) => {
+            this.setState({ jsExample1: data });
             console.log(data);
         });
     };
 
     listenToToggleControl = () => {
-        this.socket.on("toggleControl", data => {
-            console.log(data);
+        this.socket.on("controlChanged", ({ memberId }) => {
+            console.log('controlChanged', memberId)
+            this.setState({ userWithControl: memberId });
         });
+    };
+
+    handleControlToggle = memberId => {
+        this.setState({ userWithControl: memberId });
     };
 
     // Misc Functions
     handleCodeChange = ({ newValue }) => {
-        console.log("Code was changed", newValue);
+        this.state.memberId === this.state.userWithControl &&
+            this.setState(
+                { jsExample1: newValue.newValue },
+                this.emitUpdateData
+            );
+        // console.log("Code was changed", newValue.newValue);
     };
 
     handleAddInteractionBtnClick = () => {
@@ -193,12 +195,12 @@ class Meeting extends Component {
             <div className={styles.root}>
                 <InteractionsCoding
                     className={styles.codeEditor}
-                    value={this.state.interaction.value}
+                    value={this.state.jsExample1}
                     isEditorActive={isEditorActive}
                     onChange={this.handleCodeChange}
                 />
                 <div className={styles.content}>
-                    <InjectZoom />
+                    {this.state.zoomId ? <InjectZoom zoomId={this.state.zoomId}/> : null}
                 </div>
                 <CallingActions
                     onAddInteractionBtnClick={this.handleAddInteractionBtnClick}
@@ -216,6 +218,13 @@ class Meeting extends Component {
                         onClose={this.handleAddInteractionBtnClick}
                         onCreation={this.emitCreateInteraction}
                     />
+                </div>
+                <div className={styles.radioGroup}>
+                    <Radio.Group onChange={this.handleControlToggle} value={this.state.userWithControl}>
+                        {this.state.members.map(m => {
+                            return <Radio className={styles.radio} value={m.memberId}>{m.memberId}</Radio>
+                        })}
+                    </Radio.Group>
                 </div>
             </div>
         );
